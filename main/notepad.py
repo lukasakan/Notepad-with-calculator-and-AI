@@ -183,9 +183,7 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
         self.saveTimer.setSingleShot(True)
         self.saveTimer.timeout.connect(self.save)
 
-        self.saveTimer = QtCore.QTimer()
-        self.saveTimer.setSingleShot(True)
-        self.saveTimer.timeout.connect(self.save)
+
 
 
         conn = database()
@@ -199,9 +197,7 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
         conn.close()
 
 
-        last_id = get_app_state("last_note_id")
-        if last_id is not None:
-              self.load_note_by_id(int(last_id))
+
 
     def on_text_changed(self):
                 self.SaveLabel.setText("Editing…")
@@ -258,28 +254,47 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
         self.textEdit.setFont(font)
         self.Sizelabel.setText(str(8))
 
-    def load_note(self,item):
-            note_id = int(item.data(QtCore.Qt.UserRole))
-            conn=database()
-            cursor=conn.cursor()
-            cursor.execute("Select note,modified,font_size from notes where id = ?",(note_id,))
-            result=cursor.fetchone()
-            conn.close()
-            if result:
-                self.textEdit.blockSignals(True) 
-                self.textEdit.setText(result[0])
-                font = self.textEdit.font()
-                size = font.pointSize()
-                font.setPointSize(result[2] or size)
-                font_size = result[2] or 8
-                font = self.textEdit.font()
-                font.setPointSize(font_size)
-                self.textEdit.setFont(font)
+    def load_note(self, item):
+        if not item:
+            return
+    
+        note_id = int(item.data(QtCore.Qt.UserRole))
+        set_app_state("last_note_id", note_id)
+    
+        conn = database()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT note, modified, font_size FROM notes WHERE id = ?",
+            (note_id,)
+        )
+        result = cursor.fetchone()
+        conn.close()
+    
+        if result:
+            note_text, modified, font_size = result
+    
+            self.textEdit.blockSignals(True)
+            self.textEdit.setPlainText(note_text)
+    
+            font = self.textEdit.font()
+            font.setPointSize(font_size or 8)
+            self.textEdit.setFont(font)
+            self.Sizelabel.setText(str(font.pointSize()))
+    
+            readable = self.time_ago(modified)
+            self.SaveLabel.setText(f"{item.text()} — Last modified: {readable}")
+    
+            self.textEdit.blockSignals(False)
 
-                self.Sizelabel.setText(str(font_size))
-                readable = self.time_ago(result[1])
-                self.SaveLabel.setText(f"{item.text()} — Last modified: {readable}")
+
    
+    def load_note_by_id(self, note_id):
+        for i in range(self.listWidget.count()):
+            item = self.listWidget.item(i)
+            if int(item.data(QtCore.Qt.UserRole)) == note_id:
+                self.listWidget.setCurrentItem(item)
+                self.load_note(item)
+                break
 
 
 
@@ -383,6 +398,13 @@ if __name__ == "__main__":
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
-    
+
+    last_id = get_app_state("last_note_id")
+    if last_id is not None:
+        QtCore.QTimer.singleShot(
+            0, lambda: ui.load_note_by_id(int(last_id))
+        )
+
     sys.exit(app.exec_())
+
 
