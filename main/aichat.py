@@ -110,11 +110,11 @@ class Ui_MainWindow(QtCore.QObject):
             self.textEdit.clear()
             self.chat_history.append({"role": "user", "parts": [{"text": user_input}]})
 
-            # User Bubble
+            
             user_html = f"""<div align="right"><table border="0" cellpadding="10" style="background-color: #0078d4; border-radius: 15px;"><tr><td style="color: white;">{user_input}</td></tr></table></div>"""
             self.textBrowser.insertHtml(user_html)
 
-            # Thinking Bubble with UNIQUE ID
+            
             self.textBrowser.insertHtml("""
                 <div align="left">
                     <table border="0" cellpadding="10" style="background-color: #444444; border-radius: 15px;">
