@@ -11,16 +11,25 @@ its a notepad made with Python and PyQt5. You can create paseges type notes evri
 1. Clone the repository
 
 2.Set up a virtual environment:
-python -m venv .venv
-source .venv/Scripts/activate  # On Windows
-
+ ```bash
+   python -m venv .venv
+   .venv\Scripts\activate 
+```
 3.Install dependencies:
-pip install PyQt5 google-genai python-dotenv
+```bash
+    pip install PyQt5 google-genai python-dotenv
+```
 
 4. Create a .env file in the root directory and add your Google API Key:
-GOOGLE_API_KEY=your_actual_key_here
 
-5. And run this app from: python main/notepad.py
+```bash
+    GOOGLE_API_KEY=your_actual_key_here
+```
+
+5. And run this app from: 
+```bash
+    python main/notepad.py
+```
 
 ## 🖼️UI screenshots
 
