@@ -11,34 +11,27 @@ class AIWorker(QThread):
     response_received = pyqtSignal(str)
     error_occurred = pyqtSignal(str)
 
-    def __init__(self, prompt):
+    def __init__(self, history): 
         super().__init__()
-        self.prompt = prompt
+        self.history = history
 
     def run(self):
-        print("--- Worker thread is starting API call ---")
         try:
             from google.genai.types import HttpOptions 
-            
             api_key = os.getenv("GOOGLE_API_KEY") 
-            
-            
             client = genai.Client(
                 api_key=api_key,
                 http_options=HttpOptions(api_version="v1")
             )
             
-            
+            # Send the entire list of messages to Gemini
             response = client.models.generate_content(
-                model="gemini-2.5-flash", 
-                contents=self.prompt
+                model="gemini-2.5-flash-lite", 
+                contents=self.history
             )
             
-            print("--- API call finished successfully ---")
             self.response_received.emit(response.text)
-            
         except Exception as e:
-            print(f"--- Worker Error: {str(e)} ---")
             self.error_occurred.emit(str(e))
 class Ui_MainWindow(QtCore.QObject):
     def setupUi(self, MainWindow):
@@ -109,75 +102,52 @@ class Ui_MainWindow(QtCore.QObject):
         self.textEdit.installEventFilter(self)
         self.SendButton.clicked.connect(self.start_ai_task)
         self.retranslateUi(MainWindow)
+        self.chat_history = []
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-    def start_ai_task(self):
-            user_input = self.textEdit.toPlainText().strip()
-            if user_input:
-             self.textEdit.clear()
-
-         
-             user_html = f"""
-             <div align="right" style="margin-bottom: 10px;">
-                 <table border="0" cellpadding="10" style="background-color: #0078d4; border-radius: 15px;">
-                     <tr><td style="color: white;">{user_input}</td></tr>
-                 </table>
-             </div>
-             """
-             self.textBrowser.insertHtml(user_html)
-
-             
-             self.textBrowser.insertHtml(f"""
-             <div align="left" id="thinking" style="margin-bottom: 10px;">
-                 <table border="0" cellpadding="10" style="background-color: #444444; border-radius: 15px;">
-                     <tr><td style="color: #4285F4;"><i>Gemini is thinking...</i></td></tr>
-                 </table>
-             </div>
-             <br>
-             """)
-
-             self.worker = AIWorker(user_input)
-             self.worker.response_received.connect(self.handle_response)
-             self.worker.error_occurred.connect(self.handle_response)
-             self.worker.start()
     def start_ai_task(self):
         user_input = self.textEdit.toPlainText().strip()
         if user_input:
             self.textEdit.clear()
+            self.chat_history.append({"role": "user", "parts": [{"text": user_input}]})
 
-            # 1. User Bubble
-            user_html = f"""
-            <div align="right" style="margin-bottom: 10px;">
-                <table border="0" cellpadding="10" style="background-color: #0078d4; border-radius: 15px;">
-                    <tr><td style="color: white;">{user_input}</td></tr>
-                </table>
-            </div>
-            """
+            # User Bubble
+            user_html = f"""<div align="right"><table border="0" cellpadding="10" style="background-color: #0078d4; border-radius: 15px;"><tr><td style="color: white;">{user_input}</td></tr></table></div>"""
             self.textBrowser.insertHtml(user_html)
 
-            self.textBrowser.insertHtml(f"""
-            <div align="left" style="margin-bottom: 10px;">
-                <table border="0" cellpadding="10" style="background-color: #444444; border-radius: 15px;">
-                    <tr><td style="color: #4285F4;"><i>Gemini is thinking</i></td></tr>
-                </table>
-            </div>
-            <br>
+            # Thinking Bubble with UNIQUE ID
+            self.textBrowser.insertHtml("""
+                <div align="left">
+                    <table border="0" cellpadding="10" style="background-color: #444444; border-radius: 15px;">
+                        <tr><td style="color: #4285F4;"><i>ID_THINKING</i></td></tr>
+                    </table>
+                </div><br>
             """)
 
-            self.worker = AIWorker(user_input)
+            self.worker = AIWorker(self.chat_history)
             self.worker.response_received.connect(self.handle_response)
             self.worker.error_occurred.connect(self.handle_response)
             self.worker.start()
 
     def handle_response(self, text):
-       
+        # 1. Add AI response to history
+        self.chat_history.append({
+            "role": "model", 
+            "parts": [{"text": text}]
+        })
+        
+        # 2. Get current HTML
         all_html = self.textBrowser.toHtml()
         
+        # 3. Clean replacement logic
+        # We look for the ID we set in start_ai_task
+        if "ID_THINKING" in all_html:
+            new_html = all_html.replace("ID_THINKING", text)
+        else:
+            # This is a backup in case the HTML engine stripped the tags
+            new_html = all_html.replace("Gemini is thinking...", text)
         
-        new_html = all_html.replace("Gemini is thinking", f"<b>AI:</b> {text}")
-        
+        # 4. Update UI and Auto-Scroll to bottom
         self.textBrowser.setHtml(new_html)
-        
-        
         self.textBrowser.moveCursor(QtGui.QTextCursor.End)
     def eventFilter(self, obj, event):
         if obj is self.textEdit and event.type() == QtCore.QEvent.KeyPress:
