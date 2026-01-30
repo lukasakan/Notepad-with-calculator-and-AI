@@ -436,35 +436,34 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
-    import winreg  # Used to get the real Windows accent color
+    import winreg  
 
     def get_windows_accent_color():
         try:
-            # Look into the Windows Registry for the personalization settings
+            
             registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
             key = winreg.OpenKey(registry, r"Software\Microsoft\Windows\DWM")
             value, type = winreg.QueryValueEx(key, "AccentColor")
             
-            # The value is in AABBGGRR format (hex), we need to convert to RRGGBB
-            # value is an integer, so we convert to hex and strip the '0x'
+            
             h = "{:08x}".format(value)
-            # The registry stores it as BGR, we want RGB
+           
             r, g, b = h[6:8], h[4:6], h[2:4]
             return f"#{r}{g}{b}"
         except Exception:
-            # Fallback to a nice blue if something goes wrong
+           
             return "#0078d4"
 
     app = QtWidgets.QApplication(sys.argv)
     
-    # Get the REAL accent color
+    
     real_accent = get_windows_accent_color()
     
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     
-    # OVERRIDE the style with the registry color
+    
     ui.EqualButton.setStyleSheet(f"""
         QPushButton {{
             color: #ffffff;
