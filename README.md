@@ -25,10 +25,10 @@ GOOGLE_API_KEY=your_actual_key_here
 ## 🖼️UI screenshots
 
 ## Notepad
-![alt text](<Screenshot 2026-01-30 224244.png>)
+![Notepad](<images/Screenshot 2026-01-30 224244.png>)
 
 ## Calculator
-![alt text](image.png)
+![Calculator](images/image.png)
 
 ## Ai chat
-![alt text](image-1.png)
+![Ai chat](images/image-1.png)
