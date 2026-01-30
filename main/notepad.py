@@ -3,6 +3,7 @@ import winreg
 from datetime import datetime,timezone
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Calculator import Ui_MainWindow as Ui_CalculatorWindow
+from aichat import Ui_MainWindow as Ui_AIWindow
 from notepad_backend import create_db,new_note,database,set_app_state,get_app_state
 
 class Ui_MainWindow(object):
@@ -73,7 +74,7 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
         self.groupBox.setObjectName("groupBox")
         self.NewButton = QtWidgets.QPushButton(self.groupBox)
         
-        self.groupBox.setMaximumWidth(750)
+        self.groupBox.setMaximumWidth(800)
         self.groupBox.setMaximumHeight(80)
         
         layout.setAlignment(QtCore.Qt.AlignLeft)
@@ -136,7 +137,36 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
             }
         """)
         
+        self.AIButton = QtWidgets.QPushButton(self.groupBox)
+        self.AIButton.setObjectName("AIButton")                  
+        layout.addWidget(self.AIButton)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("images/Google_Gemini_icon_2025.svg.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.AIButton.setIcon(icon)
+        self.AIButton.setFixedSize(40, 30)
+        self.AIButton.setStyleSheet("""
+    QPushButton {
+        color: white;
         
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, 
+            stop:0 #4285F4,  
+            stop:0.5 #9b72cb, 
+            stop:1 #DB4437); 
+        border-radius: 8px;
+        font-weight: bold;
+        padding: 5px;
+    }
+    QPushButton:hover {
+        /* Slightly brighter on hover */
+        background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, 
+            stop:0 #5a95f5, 
+            stop:1 #e35e52);
+    }
+    QPushButton:pressed {
+        background-color: #3c4043; 
+        color: #4285F4;
+    }
+""")
         
         self.DelButton = QtWidgets.QPushButton(self.groupBox)
         
@@ -170,7 +200,7 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
 
         self.Calculator.clicked.connect(self.OpenCalculator)
         self.NewButton.clicked.connect(self.new_note_clicked)
-
+        self.AIButton.clicked.connect(self.Openai)
         self.textEdit.textChanged.connect(self.on_text_changed)
         self.listWidget.itemClicked.connect(self.load_note)
         self.DelButton.clicked.connect(self.DELete)
@@ -229,6 +259,36 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
                          """)
 
                 self.calc_window.show()
+    def Openai(self):
+                self.ai_window = QtWidgets.QMainWindow()
+                self.ai_ui = Ui_AIWindow()
+                self.ai_ui.setupUi(self.ai_window)
+                def get_windows_accent_color():
+                        try:
+                                registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+                                key = winreg.OpenKey(registry, r"Software\Microsoft\Windows\DWM")
+                                value, _ = winreg.QueryValueEx(key, "AccentColor")
+                                h = "{:08x}".format(value)
+                                r, g, b = h[6:8], h[4:6], h[2:4]
+                                return f"#{r}{g}{b}"
+                        except:
+                                return "#0078d4"
+                accent = get_windows_accent_color()
+                self.ai_ui.SendButton.setStyleSheet(f"""
+                                QPushButton {{
+                                color: #ffffff;
+                background-color: {accent};
+                border-radius: 5px;
+
+                 }}QPushButton:hover {{
+            background-color: rgb(100,100,100);
+            border-radius: 5px;
+
+        }}
+                         """)
+
+                self.ai_window.show()
+    
     def new_note_clicked(self):
         title, ok = QtWidgets.QInputDialog.getText(self.mainwindow, "New Note", "Enter note title:")
         if not ok or not title:
@@ -386,6 +446,7 @@ QPushButton:Hover{background-color: rgb(100,100,100);}
         self.DelButton.setText(_translate("MainWindow", "Delete"))
         self.PlusButton.setText(_translate("MainWindow", "+"))
         self.MinusButton.setText(_translate("MainWindow", "-"))
+        self.AIButton.setText(_translate("MainWindow", ""))
         self.Sizelabel.setText(_translate("MainWindow", str(self.textEdit.font().pointSize())))
 
 
