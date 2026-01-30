@@ -24,7 +24,7 @@ class AIWorker(QThread):
                 http_options=HttpOptions(api_version="v1")
             )
             
-            # Send the entire list of messages to Gemini
+            
             response = client.models.generate_content(
                 model="gemini-2.5-flash-lite", 
                 contents=self.history
@@ -129,24 +129,23 @@ class Ui_MainWindow(QtCore.QObject):
             self.worker.start()
 
     def handle_response(self, text):
-        # 1. Add AI response to history
+        
         self.chat_history.append({
             "role": "model", 
             "parts": [{"text": text}]
         })
         
-        # 2. Get current HTML
+       
         all_html = self.textBrowser.toHtml()
         
-        # 3. Clean replacement logic
-        # We look for the ID we set in start_ai_task
+      
         if "ID_THINKING" in all_html:
             new_html = all_html.replace("ID_THINKING", text)
         else:
-            # This is a backup in case the HTML engine stripped the tags
+          
             new_html = all_html.replace("Gemini is thinking...", text)
         
-        # 4. Update UI and Auto-Scroll to bottom
+        
         self.textBrowser.setHtml(new_html)
         self.textBrowser.moveCursor(QtGui.QTextCursor.End)
     def eventFilter(self, obj, event):
