@@ -1,5 +1,9 @@
 #📝 just simple notpad with Gemini ai and calculator
 its a notepad made with Python and PyQt5. You can create paseges type notes evrithing is saved in datbase. It autosaves, so when you close it and open it will save the page you were on and the notes that you where taiking
+
+* [✨Features](#-features)
+* [🚀Installation](#-installation)
+* [🖼️Screenshots](#-screenshots)
 ## ✨ Features
 
 * **AI Chat Integration**: Chat with Gemini 2.5 Flash directly inside the app. 
@@ -31,13 +35,13 @@ its a notepad made with Python and PyQt5. You can create paseges type notes evri
     python main/notepad.py
 ```
 
-## 🖼️UI screenshots
+## 🌄 Screenshots
 
-## Notepad
+### Notepad
 ![Notepad](<images/Screenshot 2026-01-30 224244.png>)
 
-## Calculator
+### Calculator
 ![Calculator](images/image.png)
 
-## Ai chat
+### Ai chat
 ![Ai chat](images/image-1.png)
