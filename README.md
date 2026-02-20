@@ -1,4 +1,5 @@
-##📝 Notepad with calculator and AI
+## 📝 Notepad with calculator and AI
+
 just simple notpad with Gemini ai and calculator
 its a notepad made with Python and PyQt5. You can create paseges type notes evrithing is saved in datbase. It autosaves, so when you close it and open it will save the page you were on and the notes that you where taiking
 
