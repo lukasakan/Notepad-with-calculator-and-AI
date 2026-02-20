@@ -1,7 +1,7 @@
 ## 📝 Notepad with calculator and AI
 
-just simple notpad with Gemini ai and calculator
-its a notepad made with Python and PyQt5. You can create paseges type notes evrithing is saved in datbase. It autosaves, so when you close it and open it will save the page you were on and the notes that you where taiking
+Just a simple notepad with Gemini AI and a calculator
+its a notepad made with Python and PyQt5. You can create pages and type notes. Everything is saved in a database. It autosaves, so when you close it and open it will  save the page you were on and the notes that you where taiking
 
 * [✨Features](#-features)
 * [🚀Installation](#-installation)
@@ -10,18 +10,18 @@ its a notepad made with Python and PyQt5. You can create paseges type notes evri
 
 * **AI Chat Integration**: Chat with Gemini 2.5 Flash directly inside the app. 
 * **Notepad**: Automatically saves notes to a SQLite database. Includes font scaling (+/-) and autosave
-* **Calculator**:basic Calculator with  a secondary window that pulls your Windows Accent Color dynamically for a native OS feel.
+* **Calculator**:basic Calculator with  a secondary window that pulls your Windows Accent Colour dynamically for a native OS feel.
 * **Modern UI**: Dark mode interface with a custom "Gemini Glow" animated gradient button.
 
 ## 🚀 Installation
 1. Clone the repository
 
-2.Set up a virtual environment:
+2. Set up a virtual environment:
  ```bash
    python -m venv .venv
    .venv\Scripts\activate 
 ```
-3.Install dependencies:
+3. Install dependencies:
 ```bash
     pip install PyQt5 google-genai python-dotenv
 ```
